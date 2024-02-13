@@ -8,11 +8,28 @@ let roll = 0;
 let pitch = 0;
 let yaw = 0;
 
+let xAxis = 0;
+let yAxis = 0;
+let zAxis = 0;
+
+let rocket, mat;
+
+let averageAmt = 0.1;
+let curArgs = [];
+
+function preload() {
+  rocket = loadModel('./javascript/assets/Rocket.obj', true);
+  mat = loadImage('./javascript/assets/texture.png');
+}
+
 function setup() {
   canvas = createCanvas(windowWidth, windowHeight, WEBGL);
- 
+  //debugMode();
   createEasyCam();
- 
+  for(let i = 0; i < 3; i++) {
+    curArgs[i] = 0;
+  }
+  
 }
 
 function draw() {
@@ -20,12 +37,18 @@ function draw() {
 
   noStroke();
   lights();
-  ambientMaterial(100, 0, 100);
 
-  rotateZ(pitch);
-  rotateX(roll);
+  push();
+
+  rotateZ(roll);
+  rotateX(pitch);
   rotateY(yaw);
-  box(100);
+
+  translate(xAxis, yAxis, zAxis);
+  texture(mat);
+  model(rocket);
+
+  pop();
 
 }
 
@@ -48,10 +71,26 @@ function unpackOSC(message){
   // }
 
   //uses the rotation rate to keep rotating in a certain direction
-  if(message.address == "/gyrosc/rrate"){
-    roll += map(message.args[0],-3,3,-0.1,0.1);
-    pitch += map(message.args[1],-3,3,-0.1,0.1);
-    yaw += map(message.args[2],-3,3,-0.1,0.1);
+  if(message.address == "/gyrosc/gyro"){
+    roll = message.args[0] * 0.5;
+    pitch = message.args[1] * 0.5;
+    yaw = message.args[2] * 0.5;
+  }
+
+  else if(message.address == "/gyrosc/accel"){
+
+    let newArgs = [];
+
+    for(let i = 0; i < message.args.length; i++) {
+      newArgs[i] = message.args[i] * averageAmt;
+      curArgs[i] = (curArgs[i] * (1 - averageAmt)) + newArgs[i];
+    }
+
+    xAxis = curArgs[0] * 500;
+    yAxis = curArgs[1] * 500;
+    zAxis = curArgs[2] * 500;
+
+    console.log(xAxis);
   }
 }
 
@@ -73,7 +112,7 @@ socket.on("disconnect", () => {
 // Callback function to recieve message from Node.JS
 socket.on("message", (_message) => {
 
-  console.log(_message);
+  //console.log(_message);
 
   unpackOSC(_message);
 

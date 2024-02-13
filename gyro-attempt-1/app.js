@@ -17,7 +17,7 @@ const os = require("os");//for use with osc
 
 
 let printEveryMessage = true; 
-let oscPort = "9000";//port to listen on
+let oscPort = "7200";//port to listen on
 let webServerPort = "3000";
 
 // Tell our Node.js Server to host our P5.JS sketch from the public folder.
