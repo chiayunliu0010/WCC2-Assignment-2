@@ -84,14 +84,6 @@ function rocketMovement(){
   cYPos[1] = -50*cos(pitch) + yAxis;
   cZPos[1] = -50*sin(pitch) + 50*sin(yaw) + zAxis;
 
-  /*for(let i = 0; i < cXPos.length; i++) {
-    push();
-    fill(255, 200, 200);
-    translate(cXPos[i], cYPos[i], cZPos[i]);
-    sphere(10, 10, 10);
-    pop();
-  }*/
-
   for(let i = 0; i < cXPos.length; i++) {
     let pos = createVector(cXPos[i], cYPos[i], cZPos[i]); 
     cloudVector[i].push(pos); //document the position of trail vertex
